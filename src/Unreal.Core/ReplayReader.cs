@@ -2091,12 +2091,6 @@ public abstract class ReplayReader<T> where T : Replay, new()
                 bunch.Archive = bitReader;
             }
 
-            // If the bunch claims to be larger than the data remaining in the packet, the stream is
-            // malformed/misaligned. Both ReadBits (partial) and SetTempEnd (non-partial) flag this by
-            // setting IsError without advancing the reader. Continuing would corrupt the temp-end
-            // bookkeeping and spin this loop forever, so bail out of the packet like the engine does
-            // in UNetConnection::ReceivedPacket when Reader.IsError() is true after FInBunch::SetData
-            // (Engine/Source/Runtime/Engine/Private/NetConnection.cpp, same source as the links above).
             if (bitReader.IsError)
             {
                 _logger?.LogWarning("ReceivedPacket: bunch ({bunchDataBits} bits) overflows packet {packetIndex}, aborting packet.", bunchDataBits, packetIndex);
